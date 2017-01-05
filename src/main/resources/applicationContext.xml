@@ -1,0 +1,42 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+  
+    <context:component-scan base-package="com.snapdeal.flyway.components" />
+  
+	<bean id="flywayDataSource" class="com.zaxxer.hikari.HikariDataSource"  destroy-method="close">
+		<property name="dataSourceClassName" value="com.mysql.jdbc.jdbc2.optional.MysqlDataSource"/>
+		<property name="maximumPoolSize" value="30" /> 
+		<property name="maxLifetime" value="60000" />
+		<property name="idleTimeout" value="60000" />
+		<property name="connectionTestQuery" value="SELECT 1" />
+		<property name="dataSourceProperties">
+			<props>
+				<prop key="url">jdbc:mysql://localhost:3306/pricing</prop>
+				<prop key="user">root</prop>
+				<prop key="password"></prop>
+				<prop key="prepStmtCacheSize">250</prop>
+				<prop key="prepStmtCacheSqlLimit">2048</prop>
+				<prop key="cachePrepStmts">true</prop>
+				<prop key="useServerPrepStmts">true</prop>
+				<prop key="autoReconnect">true</prop>
+				<prop key="autoReconnectForPools">true</prop>
+				<prop key="reconnectAtTxEnd">true</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="flywayRepair" class="org.flywaydb.core.Flyway" init-method="repair">
+	    	<property name="baselineOnMigrate" value="true" />
+	    	<property name="locations" value="classpath:/db/migration/" />
+	    	<property name="dataSource" ref="flywayDataSource" />
+	</bean>
+	<bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
+	    	<property name="baselineOnMigrate" value="true" />
+	    	<property name="locations" value="classpath:/db/migration/" />
+	    	<property name="dataSource" ref="flywayDataSource" />
+	</bean>
+  
+</beans>
